@@ -1,21 +1,28 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Col, Container, Image, Row } from 'react-bootstrap';
+import { Button, Col, Container, Image, Row } from 'react-bootstrap';
+import Ingredients from './Ingredients';
+import Instructions from './Instructions';
 
 function Cocktail() {
   const [drinkInfo, setDrinkInfo] = useState({});
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    axios('/api/cocktail')
+  const loadRandom = () => {
+    return axios('/api/cocktail')
       .then((res) => {
         setDrinkInfo(res.data);
-        setLoading(false);
       })
       .catch((err) => {
         // TODO: add error handling
         console.log(err.response.data);
       });
+  };
+
+  useEffect(() => {
+    loadRandom().then(() => {
+      setLoading(false);
+    });
   }, []);
 
   return loading ? (
@@ -25,16 +32,16 @@ function Cocktail() {
       <Row>
         <Col md={6}>
           <h1 className="mb-4">{drinkInfo.name}</h1>
-          <h3>Ingredients</h3>
-          <ul>
-            {drinkInfo.ingredients.map((ingredient, i) => (
-              <li key={i}>
-                {ingredient} - {drinkInfo.measures[i]}
-              </li>
-            ))}
-          </ul>
-          <h3>Instructions</h3>
-          <p>{drinkInfo.instructions}</p>
+          <Ingredients
+            ingredients={drinkInfo.ingredients}
+            measures={drinkInfo.measures}
+          />
+          <Instructions text={drinkInfo.instructions} />
+          <section id="actions">
+            <Button variant="dark" onClick={loadRandom}>
+              Get me an other one
+            </Button>
+          </section>
         </Col>
         <Col md={6}>
           <Image src={drinkInfo.image} alt={drinkInfo.name} fluid />
