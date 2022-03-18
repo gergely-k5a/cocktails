@@ -4,7 +4,7 @@ const Ingredients = ({ ingredients = [], measures = [] }) => (
     <ul>
       {ingredients.map((ingredient, i) => (
         <li key={i}>
-          {ingredient} - {measures[i]}
+          {measures[i] ? `${measures[i]} ${ingredient}` : ingredient}
         </li>
       ))}
     </ul>
