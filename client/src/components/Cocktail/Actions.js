@@ -1,11 +1,18 @@
+import { useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 
-const Actions = ({ handlers, searchStr }) => {
+const Actions = ({ loadCocktail }) => {
+  const [searchStr, setSearchStr] = useState('');
+
   const onKeyDown = (e) => {
     if (e.keyCode === 13) {
       e.preventDefault();
-      handlers.searchCocktail();
+      loadCocktail(searchStr);
     }
+  };
+
+  const onSearchStrChange = (e) => {
+    setSearchStr(e.target.value);
   };
 
   return (
@@ -17,18 +24,23 @@ const Actions = ({ handlers, searchStr }) => {
             <Form.Control
               type="text"
               placeholder="Enter cocktail name"
-              onChange={handlers.onSearchStrChange}
+              onChange={onSearchStrChange}
               onKeyDown={onKeyDown}
               value={searchStr}
             />
-            <Button variant="dark" onClick={handlers.searchCocktail}>
+            <Button
+              variant="dark"
+              onClick={() => {
+                loadCocktail(searchStr);
+              }}
+            >
               Search
             </Button>
           </InputGroup>
         </Form.Group>
         <div className="form-separator my-2">- OR -</div>
         <Form.Group controlId="formLoadRandom">
-          <Button variant="dark" onClick={handlers.loadRandom}>
+          <Button variant="dark" onClick={() => loadCocktail()}>
             Just get me a random one
           </Button>
         </Form.Group>

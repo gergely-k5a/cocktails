@@ -4,29 +4,18 @@ import { Col, Container, Image, Row } from 'react-bootstrap';
 import Ingredients from './Ingredients';
 import Instructions from './Instructions';
 import Actions from './Actions';
+import Loader from './Loader';
 
 function Cocktail() {
   const [drinkInfo, setDrinkInfo] = useState({});
   const [loading, setLoading] = useState(true);
-  const [searchStr, setSearchStr] = useState('');
 
-  const onSearchStrChange = (e) => {
-    setSearchStr(e.target.value);
-  };
+  const loadCocktail = (searchStr) => {
+    let url = '/api/cocktail';
 
-  const loadRandom = () => {
-    return axios('/api/cocktail')
-      .then((res) => {
-        setDrinkInfo(res.data);
-      })
-      .catch((err) => {
-        // TODO: add error handling
-        console.log(err.response.data);
-      });
-  };
+    if (searchStr) url += `?searchStr=${searchStr}`;
 
-  const searchCocktail = () => {
-    axios(`/api/cocktail?searchStr=${searchStr}`)
+    return axios(url)
       .then((res) => {
         setDrinkInfo(res.data);
       })
@@ -37,32 +26,31 @@ function Cocktail() {
   };
 
   useEffect(() => {
-    loadRandom().then(() => {
+    loadCocktail().then(() => {
       setLoading(false);
     });
   }, []);
 
-  return loading ? (
-    <div>Loading...</div>
-  ) : (
+  return (
     <Container className="mt-5">
-      <Row>
-        <Col md={6}>
-          <h1 className="mb-4">{drinkInfo.name}</h1>
-          <Ingredients
-            ingredients={drinkInfo.ingredients}
-            measures={drinkInfo.measures}
-          />
-          <Instructions text={drinkInfo.instructions} />
-          <Actions
-            handlers={{ loadRandom, onSearchStrChange, searchCocktail }}
-            searchStr={searchStr}
-          />
-        </Col>
-        <Col md={6}>
-          <Image src={drinkInfo.image} alt={drinkInfo.name} fluid />
-        </Col>
-      </Row>
+      {loading ? (
+        <Loader />
+      ) : (
+        <Row>
+          <Col md={6}>
+            <h1 className="mb-4">{drinkInfo.name}</h1>
+            <Ingredients
+              ingredients={drinkInfo.ingredients}
+              measures={drinkInfo.measures}
+            />
+            <Instructions text={drinkInfo.instructions} />
+            <Actions loadCocktail={loadCocktail} />
+          </Col>
+          <Col md={6}>
+            <Image src={drinkInfo.image} alt={drinkInfo.name} fluid />
+          </Col>
+        </Row>
+      )}
     </Container>
   );
 }
